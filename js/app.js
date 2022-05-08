@@ -14,13 +14,15 @@ class Node {
         return [this.#X, this.#Y]
     }
 }
-const headColor='lawngreen'
-const bodyColor='yellow'
-const appleColor='red'
-const fieldColor='white'
+
+const headColor = 'lawngreen'
+const bodyColor = 'yellow'
+const appleColor = 'red'
+const fieldColor = 'white'
 
 const game = {
     score: document.querySelector("#Score"),
+    isKeyEnable: true,
     queue: {
         items: [],
         head: 0,
@@ -65,6 +67,7 @@ const game = {
         }
     },
     reStart() {
+        this.isKeyEnable = true
         this.score.textContent = '1'
         this.directionVector.x = 1
         this.directionVector.y = 0
@@ -83,8 +86,8 @@ const game = {
     },
     continue() {
         const headPosition = (this.queue.items[this.queue.head]).position
-        let newHeadX = headPosition[0]+this.directionVector.y
-        let newHeadY = headPosition[1]+this.directionVector.x
+        let newHeadX = headPosition[0] + this.directionVector.y
+        let newHeadY = headPosition[1] + this.directionVector.x
 
         if (newHeadX < 0 || newHeadX > 9)
             newHeadX = 10 - Math.abs(newHeadX)
@@ -101,7 +104,7 @@ const game = {
         }
         this.queue.enqueue(new Node(newHeadX, newHeadY))
         this.field.draw(newHeadX, newHeadY, headColor)
-        this.field.draw(headPosition[0],headPosition[1],bodyColor)
+        this.field.draw(headPosition[0], headPosition[1], bodyColor)
 
         if (isRed) {
             this.field.apple()
@@ -111,26 +114,30 @@ const game = {
             const tailElement = this.queue.decueue()
             this.field.draw(tailElement.position[0], tailElement.position[1])
         }
-
+        this.isKeyEnable = true
     }
 }
 
 document.addEventListener('keydown', function (event) {
-    if (event.code === 'ArrowUp' && game.directionVector.y !== 1) {
+    if (event.code === 'ArrowUp' && game.directionVector.y !== 1 && game.isKeyEnable) {
         game.directionVector.x = 0
         game.directionVector.y = -1
+        game.isKeyEnable = false
     }
-    if (event.code === 'ArrowRight' && game.directionVector.x !== -1) {
+    if (event.code === 'ArrowRight' && game.directionVector.x !== -1 && game.isKeyEnable) {
         game.directionVector.x = 1
         game.directionVector.y = 0
+        game.isKeyEnable = false
     }
-    if (event.code === 'ArrowDown' && game.directionVector.y !== -1) {
+    if (event.code === 'ArrowDown' && game.directionVector.y !== -1 && game.isKeyEnable) {
         game.directionVector.x = 0
         game.directionVector.y = 1
+        game.isKeyEnable = false
     }
-    if (event.code === 'ArrowLeft' && game.directionVector.x !== 1) {
+    if (event.code === 'ArrowLeft' && game.directionVector.x !== 1 && game.isKeyEnable) {
         game.directionVector.x = -1
         game.directionVector.y = 0
+        game.isKeyEnable = false
     }
     if (event.code === 'Space' && game.isPrepare) {
         if (!game.isMove) {
