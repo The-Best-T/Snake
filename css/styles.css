@@ -2,21 +2,21 @@
     background-color: white;
     width: 30px;
     height: 30px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: white;
     border-radius: 50%;
 }
 
 .field {
     margin: auto;
 }
-#Score{
-    color:white;
+
+#Score {
+    color: white;
 }
-body{
+
+body {
     background-color: black;
 }
-h2{
+
+h2 {
     color: white;
 }
