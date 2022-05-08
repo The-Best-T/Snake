@@ -1,18 +1,22 @@
 .field td {
-    background-color: black;
+    background-color: white;
     width: 30px;
     height: 30px;
     border-style: solid;
     border-width: 1px;
     border-color: white;
+    border-radius: 50%;
 }
 
 .field {
-    border-style: solid;
-    border-width: 5px;
-    border-color: red;
     margin: auto;
 }
 #Score{
-    color:red;
+    color:white;
+}
+body{
+    background-color: black;
+}
+h2{
+    color: white;
 }

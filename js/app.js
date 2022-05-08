@@ -14,6 +14,10 @@ class Node {
         return [this.#X, this.#Y]
     }
 }
+const headColor='lawngreen'
+const bodyColor='yellow'
+const appleColor='red'
+const fieldColor='white'
 
 const game = {
     score: document.querySelector("#Score"),
@@ -50,13 +54,13 @@ const game = {
             while (!isSet) {
                 const x = rnd(0, 9)
                 const y = rnd(0, 9)
-                if (this.rows[x].cells[y].style.backgroundColor === 'black') {
-                    this.draw(x, y, 'red')
+                if (this.rows[x].cells[y].style.backgroundColor === fieldColor) {
+                    this.draw(x, y, appleColor)
                     isSet = true
                 }
             }
         },
-        draw(x, y, color = 'black') {
+        draw(x, y, color = fieldColor) {
             this.rows[x].cells[y].style.backgroundColor = color
         }
     },
@@ -68,35 +72,36 @@ const game = {
         this.queue.clear()
         for (const row of this.field.rows) {
             for (const cell of row.cells) {
-                cell.style.backgroundColor = 'black'
+                cell.style.backgroundColor = fieldColor
             }
         }
         clearInterval(this.interval)
         this.queue.enqueue(new Node(0, 0))
-        this.field.draw(0, 0, 'green')
+        this.field.draw(0, 0, headColor)
         this.field.apple()
         this.isPrepare = true
     },
     continue() {
         const headPosition = (this.queue.items[this.queue.head]).position
-        headPosition[0] += this.directionVector.y
-        headPosition[1] += this.directionVector.x
+        let newHeadX = headPosition[0]+this.directionVector.y
+        let newHeadY = headPosition[1]+this.directionVector.x
 
-        if (headPosition[0] < 0 || headPosition[0] > 9)
-            headPosition[0] = 10 - Math.abs(headPosition[0])
-        if (headPosition[1] < 0 || headPosition[1] > 9)
-            headPosition[1] = 10 - Math.abs(headPosition[1])
+        if (newHeadX < 0 || newHeadX > 9)
+            newHeadX = 10 - Math.abs(newHeadX)
+        if (newHeadY < 0 || newHeadY > 9)
+            newHeadY = 10 - Math.abs(newHeadY)
 
-        const headCell = this.field.rows[headPosition[0]].cells[headPosition[1]]
+        const headCell = this.field.rows[newHeadX].cells[newHeadY]
         let isRed = false
-        if (headCell.style.backgroundColor === 'red')
+        if (headCell.style.backgroundColor === appleColor)
             isRed = true
-        if (headCell.style.backgroundColor === 'green') {
+        if (headCell.style.backgroundColor === bodyColor) {
             this.reStart()
             return
         }
-        this.queue.enqueue(new Node(headPosition[0], headPosition[1]))
-        this.field.draw(headPosition[0], headPosition[1], 'green')
+        this.queue.enqueue(new Node(newHeadX, newHeadY))
+        this.field.draw(newHeadX, newHeadY, headColor)
+        this.field.draw(headPosition[0],headPosition[1],bodyColor)
 
         if (isRed) {
             this.field.apple()
