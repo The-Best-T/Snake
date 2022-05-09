@@ -21,7 +21,9 @@ const game = {
         this.isMove = false
         this.snake.clear()
         clearInterval(this.interval)
-        this.snake.enqueue(new Node(0, 0))
+        this.snake.enqueue(new Node({
+            x: 0, y: 0
+        }))
 
         for (const row of this.field.rows) {
             for (const cell of row.cells) {
@@ -37,21 +39,19 @@ const game = {
         let newHeadX = headPosition[0] + this.directionVector.y
         let newHeadY = headPosition[1] + this.directionVector.x
 
-        if (newHeadX < 0 || newHeadX > 9)
-            newHeadX = 10 - Math.abs(newHeadX)
-        if (newHeadY < 0 || newHeadY > 9)
-            newHeadY = 10 - Math.abs(newHeadY)
+        if (newHeadX < 0 || newHeadX > 9) newHeadX = 10 - Math.abs(newHeadX)
+        if (newHeadY < 0 || newHeadY > 9) newHeadY = 10 - Math.abs(newHeadY)
 
         let isApple = false
-        if (newHeadX === fieldFile.field.apple.x && newHeadY === fieldFile.field.apple.y)
-            isApple = true
-        if (fieldFile.field.rows[newHeadX]
-            .cells[newHeadY].style.backgroundColor === fieldFile.bodyColor) {
+        if (newHeadX === fieldFile.field.apple.x && newHeadY === fieldFile.field.apple.y) isApple = true
+        if (fieldFile.field.rows[newHeadX].cells[newHeadY].style.backgroundColor === fieldFile.bodyColor) {
             this.reStart()
             return
         }
 
-        this.snake.enqueue(new Node(newHeadX, newHeadY))
+        this.snake.enqueue(new Node({
+            x: newHeadX, y: newHeadY
+        }))
         this.field.draw(newHeadX, newHeadY, fieldFile.headColor)
         this.field.draw(headPosition[0], headPosition[1], fieldFile.bodyColor)
 
