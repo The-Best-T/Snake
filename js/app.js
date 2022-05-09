@@ -1,91 +1,39 @@
-const rnd = (left, right) =>
-    Math.round(Math.random() * (right - left) + left)
+import {queue} from './Queue.js'
+import Node from './Node.js'
+import * as fieldFile from './Field.js'
 
-class Node {
-    #X
-    #Y
-
-    constructor(x = 0, y = 0) {
-        this.#X = x
-        this.#Y = y
-    }
-
-    get position() {
-        return [this.#X, this.#Y]
-    }
-}
-
-const headColor = 'lawngreen'
-const bodyColor = 'yellow'
-const appleColor = 'red'
-const fieldColor = 'white'
+const $score = document.querySelector("#Score")
 
 const game = {
-    score: document.querySelector("#Score"),
+    score: $score,
     isKeyEnable: true,
-    queue: {
-        items: [],
-        head: 0,
-        length: 0,
-        enqueue(elemet) {
-            this.length++;
-            this.items.unshift(elemet)
-        },
-        decueue() {
-            if (this.length < 1)
-                return undefined
-            this.length--
-            return this.items.pop()
-        },
-        clear() {
-            this.items = []
-            this.length = 0
-        }
-    },
-    directionVector: {
-        x: 0,
-        y: 0
-    },
+    snake: queue,
+    directionVector: {},
     interval: 0,
     isMove: false,
     isPrepare: false,
-    field: {
-        rows: document.querySelectorAll("tr"),
-        apple() {
-            let isSet = false
-            while (!isSet) {
-                const x = rnd(0, 9)
-                const y = rnd(0, 9)
-                if (this.rows[x].cells[y].style.backgroundColor === fieldColor) {
-                    this.draw(x, y, appleColor)
-                    isSet = true
-                }
-            }
-        },
-        draw(x, y, color = fieldColor) {
-            this.rows[x].cells[y].style.backgroundColor = color
-        }
-    },
+    field: fieldFile.field,
     reStart() {
         this.isKeyEnable = true
         this.score.textContent = '1'
         this.directionVector.x = 1
         this.directionVector.y = 0
         this.isMove = false
-        this.queue.clear()
+        this.snake.clear()
+        clearInterval(this.interval)
+        this.snake.enqueue(new Node(0, 0))
+
         for (const row of this.field.rows) {
             for (const cell of row.cells) {
-                cell.style.backgroundColor = fieldColor
+                cell.style.backgroundColor = fieldFile.fieldColor
             }
         }
-        clearInterval(this.interval)
-        this.queue.enqueue(new Node(0, 0))
-        this.field.draw(0, 0, headColor)
-        this.field.apple()
+        this.field.draw(0, 0, fieldFile.headColor)
+        this.field.setApple()
         this.isPrepare = true
     },
     continue() {
-        const headPosition = (this.queue.items[this.queue.head]).position
+        const headPosition = (this.snake.items[this.snake.head]).position
         let newHeadX = headPosition[0] + this.directionVector.y
         let newHeadY = headPosition[1] + this.directionVector.x
 
@@ -94,24 +42,24 @@ const game = {
         if (newHeadY < 0 || newHeadY > 9)
             newHeadY = 10 - Math.abs(newHeadY)
 
-        const headCell = this.field.rows[newHeadX].cells[newHeadY]
-        let isRed = false
-        if (headCell.style.backgroundColor === appleColor)
-            isRed = true
-        if (headCell.style.backgroundColor === bodyColor) {
+        let isApple = false
+        if (newHeadX === fieldFile.field.apple.x && newHeadY === fieldFile.field.apple.y)
+            isApple = true
+        if (fieldFile.field.rows[newHeadX]
+            .cells[newHeadY].style.backgroundColor === fieldFile.bodyColor) {
             this.reStart()
             return
         }
-        this.queue.enqueue(new Node(newHeadX, newHeadY))
-        this.field.draw(newHeadX, newHeadY, headColor)
-        this.field.draw(headPosition[0], headPosition[1], bodyColor)
 
-        if (isRed) {
-            this.field.apple()
-            const newScore = +this.score.textContent + 1
-            this.score.textContent = `${newScore}`
+        this.snake.enqueue(new Node(newHeadX, newHeadY))
+        this.field.draw(newHeadX, newHeadY, fieldFile.headColor)
+        this.field.draw(headPosition[0], headPosition[1], fieldFile.bodyColor)
+
+        if (isApple) {
+            this.field.setApple()
+            this.score.textContent = `${this.snake.length}`
         } else {
-            const tailElement = this.queue.decueue()
+            const tailElement = this.snake.decueue()
             this.field.draw(tailElement.position[0], tailElement.position[1])
         }
         this.isKeyEnable = true
@@ -141,7 +89,7 @@ document.addEventListener('keydown', function (event) {
     }
     if (event.code === 'Space' && game.isPrepare) {
         if (!game.isMove) {
-            game.interval = setInterval(game.continue.bind(game), 300)
+            game.interval = setInterval(game.continue.bind(game), 200 + game.snake.length * 10)
             game.isMove = true
         } else {
             game.isMove = false
