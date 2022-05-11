@@ -39,8 +39,10 @@ const game = {
         let newHeadX = headPosition[0] + this.directionVector.y
         let newHeadY = headPosition[1] + this.directionVector.x
 
-        if (newHeadX < 0 || newHeadX > 9) newHeadX = 10 - Math.abs(newHeadX)
-        if (newHeadY < 0 || newHeadY > 9) newHeadY = 10 - Math.abs(newHeadY)
+        if (newHeadX < 0 || newHeadX >= fieldFile.field.rowsCount)
+            newHeadX = fieldFile.field.rowsCount - Math.abs(newHeadX)
+        if (newHeadY < 0 || newHeadY >= fieldFile.field.columnsCount)
+            newHeadY = fieldFile.field.columnsCount - Math.abs(newHeadY)
 
         let isApple = false
         if (newHeadX === fieldFile.field.apple.x && newHeadY === fieldFile.field.apple.y) isApple = true
